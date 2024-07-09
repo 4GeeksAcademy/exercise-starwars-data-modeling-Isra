@@ -14,7 +14,7 @@ class User(Base):
     name = Column(String(100), nullable=False)
     password = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False)
-    favorites = relationship("Favorite")
+    favorites = relationship("Favorite", backref="user", lazy=True)
 
 class Character(Base):
     __tablename__ = 'character'
@@ -26,7 +26,7 @@ class Character(Base):
     hair_color = Column(Enum('brown', 'blond', 'red', 'black', 'n/a'))
     eye_color = Column(Enum('brown', 'green', 'blue', 'gold', 'n/a'))
     planet_id = Column(Integer, ForeignKey('planet.id'))
-    planet= relationship("Planet")
+    Vehicle= relationship("Vehicle", backref='character', lazy=True)
 
 class Planet(Base):
     __tablename__ = 'planet'
@@ -38,7 +38,8 @@ class Planet(Base):
     orbital_period = Column(Integer)
     rotation_period = Column(Integer)
     diameter = Column(Integer)
-    characters = relationship("Character")
+    description= Column(String(1000))
+    characters = relationship("Character", backref='planet', lazy=True)
 
 class Vehicle(Base):
     __tablename__ = 'vehicle'
@@ -49,20 +50,16 @@ class Vehicle(Base):
     manufacturer= Column(Enum('Incom Corporation', 'Corellia Mining Corporation'), nullable=False)
     length= Column(Integer)
     passengers= Column(Integer)
+    max_atmosphering_speed= Column(Integer)
+    consumables= Column(String(100))
     pilot_id= Column(Integer, ForeignKey('character.id'))
-    character= relationship("Character")
 
 class Favorites(Base):
-    __tablename__ = 'favorite'
+    __tablename__ = 'favorites'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    character_id = Column(Integer, ForeignKey('character.id'))
-    planet_id = Column(Integer, ForeignKey('planet.id'))
-    vehicle_id = Column(Integer, ForeignKey('vehicle.id'))
-    user= relationship("User")
-    character= relationship("Character")
-    planet= relationship("Planet")
-    vehicle= relationship("Vehicle")
+    favorite_type = Column(Enum('character', 'planet', 'vehicle'))
+    favorite_id = Column(Integer)
 
 
 ## Draw from SQLAlchemy base
